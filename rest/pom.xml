@@ -15,6 +15,16 @@
     <dependencies>
         <dependency>
             <groupId>me.takehara</groupId>
+            <artifactId>driver</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>me.takehara</groupId>
+            <artifactId>gateway</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>me.takehara</groupId>
             <artifactId>usecase</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
@@ -39,5 +49,28 @@
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.insert-koin</groupId>
+            <artifactId>koin-core-ext</artifactId>
+            <version>${koin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.insert-koin</groupId>
+            <artifactId>koin-ktor</artifactId>
+            <version>${koin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.insert-koin</groupId>
+            <artifactId>koin-logger-slf4j</artifactId>
+            <version>${koin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.insert-koin</groupId>
+            <artifactId>koin-test-junit5</artifactId>
+            <version>${koin.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 </project>
