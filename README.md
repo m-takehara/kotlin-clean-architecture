@@ -23,6 +23,9 @@ Apache Maven 3.6.3
 
 ## 起動
 
+Postgres をあらかじめ起動しておく。
+docker-compose が [m\-takehara/kotlin\-clean\-architecture\-environment](https://github.com/m-takehara/kotlin-clean-architecture-environment) にあるのでこれを使用する。
+
 ```text
 $ mvn install
 $ mvn exec:java -pl rest -Dexec.mainClass=me.takehara.rest.MainKt
