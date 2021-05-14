@@ -16,8 +16,8 @@ class UserGateway(
         loginId: LoginId,
         loginPassword: LoginPassword
     ): UserId {
-        val userId = uuidDriver.generate(::UserId)
-        val createdAt = datetimeDriver.getNow(::CreatedAt)
+        val userId = uuidDriver.generate().let(::UserId)
+        val createdAt = datetimeDriver.getNow().let(::CreatedAt)
         userDriver.registerUser(userId, createdAt)
         userDriver.registerUserProfile(userId, createdAt, userName, mailAddress)
         userDriver.registerUserAuth(userId, createdAt, loginId, loginPassword)
