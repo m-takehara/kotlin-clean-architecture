@@ -3,10 +3,8 @@ package me.takehara.rest
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.serialization.*
-import me.takehara.driver.DateTimeDriverImpl
 import me.takehara.driver.UuidDriverImpl
 import me.takehara.driver.user.UserDriverImpl
-import me.takehara.gateway.DatetimeDriver
 import me.takehara.gateway.UuidDriver
 import me.takehara.gateway.user.UserDriver
 import me.takehara.gateway.user.UserGateway
@@ -34,7 +32,6 @@ fun Application.module(testing: Boolean = false) {
 
 val commonModules = module(createdAtStart = true) {
     singleBy<UuidDriver, UuidDriverImpl>()
-    singleBy<DatetimeDriver, DateTimeDriverImpl>()
 }
 
 val userModules = module(createdAtStart = true) {

@@ -22,15 +22,29 @@ fun Route.userRouting() {
     route("/users") {
         val usecase by inject<UserUsecase>()
         get("{id}") {
-            val id = call.parameters["id"]?.let(::UserId) ?: return@get call.respond("ID not found")
+            val id = call.parameters["id"]?.let(::UserId) ?: return@get run {
+                call.response.status(HttpStatusCode.BadRequest)
+                call.respond(UserIdRequiredResponse())
+            }
 
-            val userProfile = usecase.findUserProfile(id)
-
-            call.response.status(HttpStatusCode.OK)
-            call.respond(UserProfileResponse(userProfile))
+            kotlin.runCatching {
+                usecase.findUserProfile(id)
+            }.onSuccess {
+                call.response.status(HttpStatusCode.OK)
+                call.respond(UserProfileResponse(it))
+            }.onFailure {
+                call.response.status(HttpStatusCode.NotFound)
+                call.respond(UserNotFoundResponse.of(id))
+            }
         }
         post {
-            val (name, mailAddress, password) = call.receive<UserRegisterRequest>()
+            val (name, mailAddress, password) = try {
+                call.receive<UserRegisterRequest>()
+            } catch (e: Exception) {
+                call.response.status(HttpStatusCode.BadRequest)
+                call.respond(BadRegistrationRequestResponse())
+                return@post
+            }
 
             // TODO: パスワードをどのタイミングでハッシュ化するか考える
             val userId = usecase.registerUser(UserName(name), MailAddress(mailAddress), LoginPassword(password))

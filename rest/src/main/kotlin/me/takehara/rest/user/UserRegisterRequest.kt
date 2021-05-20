@@ -16,3 +16,8 @@ data class UserRegisterResponse(
 ) {
     constructor(id: UserId) : this(id.value)
 }
+
+@Serializable
+data class BadRegistrationRequestResponse(
+    val error: String = "required \"name\", \"mailAddress\" and \"password\" in request."
+)
