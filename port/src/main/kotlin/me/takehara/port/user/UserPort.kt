@@ -8,6 +8,6 @@ interface UserPort {
     fun findUserProfile(id: UserId): UserProfile
 
     fun registerUser(): UserId
-    fun registerUserAuth(id: UserId, loginId: LoginId, loginPassword: LoginPassword)
+    fun registerUserAuth(id: UserId, loginId: LoginId, loginPassword: EncryptedLoginPassword)
     fun registerUserProfile(id: UserId, name: UserName, mailAddress: MailAddress)
 }

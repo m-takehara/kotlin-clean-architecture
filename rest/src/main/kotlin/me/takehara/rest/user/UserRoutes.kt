@@ -5,10 +5,12 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import me.takehara.domain.user.LoginPassword
 import me.takehara.domain.user.MailAddress
+import me.takehara.domain.user.RawLoginPassword
 import me.takehara.domain.user.UserId
 import me.takehara.domain.user.UserName
+import me.takehara.port.user.LoginIdAlreadyUsedException
+import me.takehara.port.user.MailAddressAlreadyUsedException
 import me.takehara.usecase.user.UserUsecase
 import org.koin.ktor.ext.inject
 
@@ -46,11 +48,17 @@ fun Route.userRouting() {
                 return@post
             }
 
-            // TODO: パスワードをどのタイミングでハッシュ化するか考える
-            val userId = usecase.registerUser(UserName(name), MailAddress(mailAddress), LoginPassword(password))
-
-            call.response.status(HttpStatusCode.Created)
-            call.respond(UserRegisterResponse(userId))
+            try {
+                val userId = usecase.registerUser(UserName(name), MailAddress(mailAddress), RawLoginPassword(password))
+                call.response.status(HttpStatusCode.Created)
+                call.respond(UserRegisterResponse(userId))
+            } catch (e: MailAddressAlreadyUsedException) {
+                call.response.status(HttpStatusCode.BadRequest)
+                call.respond(MailAddressAlreadyUsedResponse(e.mailAddress))
+            } catch (e: LoginIdAlreadyUsedException) {
+                call.response.status(HttpStatusCode.BadRequest)
+                call.respond(LoginIdAlreadyUsedResponse(e.loginId))
+            }
         }
     }
 }

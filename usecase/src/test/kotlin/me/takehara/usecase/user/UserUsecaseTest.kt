@@ -18,23 +18,28 @@ class UserUsecaseTest : FunSpec({
         val userId = mockk<UserId>()
         val userName = mockk<UserName>()
         val mailAddress = mockk<MailAddress>()
+        // NOTE: LoginId のコンストラクタをモックすることができないため mockk<LoginId> を使っていない
         val loginId = LoginId("mailAddress")
-        val loginPassword = mockk<LoginPassword>()
+        val rawLoginPassword = mockk<RawLoginPassword>()
+        val encryptedPassword = mockk<EncryptedLoginPassword>()
 
-        every { mailAddress.value } returns "mailAddress"
         every { userPort.createTransaction(any<() -> UserId>()) } answers { firstArg<() -> UserId>()() }
+
+        every { mailAddress.value } returns loginId.value
+        every { rawLoginPassword.encrypt() } returns encryptedPassword
         every { userPort.registerUser() } returns userId
         every { userPort.registerUserProfile(userId, userName, mailAddress) } just runs
-        every { userPort.registerUserAuth(userId, loginId, loginPassword) } just runs
+        every { userPort.registerUserAuth(userId, loginId, encryptedPassword) } just runs
 
-        val actual = target.registerUser(userName, mailAddress, loginPassword)
+        val actual = target.registerUser(userName, mailAddress, rawLoginPassword)
 
         actual shouldBe userId
-        verify { mailAddress.value }
         verify { userPort.createTransaction(any<() -> UserId>()) }
+        verify { mailAddress.value }
+        verify { rawLoginPassword.encrypt() }
         verify { userPort.registerUser() }
         verify { userPort.registerUserProfile(userId, userName, mailAddress) }
-        verify { userPort.registerUserAuth(userId, loginId, loginPassword) }
+        verify { userPort.registerUserAuth(userId, loginId, encryptedPassword) }
     }
 
     test("ユーザIDを与えると、そのユーザIDを含むユーザプロファイルを得られる") {
@@ -44,8 +49,9 @@ class UserUsecaseTest : FunSpec({
         every { userPort.createTransaction(any<() -> UserProfile>()) } answers { firstArg<() -> UserProfile>()() }
         every { userPort.findUserProfile(id) } returns profile
 
-        target.findUserProfile(id)
+        val actual = target.findUserProfile(id)
 
+        actual shouldBe profile
         verify { userPort.createTransaction(any<() -> Unit>()) }
         verify { userPort.findUserProfile(id) }
     }

@@ -7,12 +7,14 @@ class UserUsecase(private val userPort: UserPort) {
     fun registerUser(
         userName: UserName,
         mailAddress: MailAddress,
-        loginPassword: LoginPassword
+        rawLoginPassword: RawLoginPassword
     ): UserId = userPort.createTransaction {
-        val id = userPort.registerUser()
         val loginId = LoginId(mailAddress.value)
+        val password = rawLoginPassword.encrypt()
+
+        val id = userPort.registerUser()
         userPort.registerUserProfile(id, userName, mailAddress)
-        userPort.registerUserAuth(id, loginId, loginPassword)
+        userPort.registerUserAuth(id, loginId, password)
         return@createTransaction id
     }
 
