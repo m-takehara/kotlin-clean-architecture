@@ -19,20 +19,48 @@ OpenJDK 64-Bit Server VM Corretto-11.0.10.9.1 (build 11.0.10+9-LTS, mixed mode)
 
 $ mvn -version
 Apache Maven 3.6.3
+
+$ docker --version
+Docker version 20.10.6, build 370c289
+
+$ gauge version 
+Gauge version: 1.1.8
+Plugins
+-------
+html-report (4.0.12)
+java (0.7.15)
+screenshot (0.0.1)
 ```
 
-## 起動
+## 環境構築
 
-Postgres をあらかじめ起動しておく。
-docker-compose が [m\-takehara/kotlin\-clean\-architecture\-environment](https://github.com/m-takehara/kotlin-clean-architecture-environment) にあるのでこれを使用する。
+```shell
+export SOURCES_ROOT_DIR=$(pwd)
 
-```text
-$ mvn install
-$ mvn exec:java -pl rest -Dexec.mainClass=me.takehara.rest.MainKt
-# 終了時は Ctrl + C、終了に若干時間がかかる
+# リポジトリを Clone
+git clone git@github.com:m-takehara/kotlin-clean-architecture.git
+git clone git@github.com:m-takehara/kotlin-clean-architecture-environment.git
+git clone git@github.com:m-takehara/kotlin-clean-architecture-e2e.git
+
+# データベースを起動
+cd "$SOURCES_ROOT_DIR/kotlin-clean-architecture-environment/postgres"
+docker compose up -d
+
+# アプリケーションを起動
+cd "$SOURCES_ROOT_DIR/kotlin-clean-architecture"
+mvn install
+mvn exec:java -pl rest -Dexec.mainClass=me.takehara.rest.MainKt
+
+# アプリケーションの単体テストを実行
+cd "$SOURCES_ROOT_DIR/kotlin-clean-architecture"
+mvn test
+
+# E2E テストを実行
+cd "$SOURCES_ROOT_DIR/kotlin-clean-architecture-e2e"
+mvn gauge:execute
 ```
 
-## リクエスト送信
+## アプリケーションへのリクエスト送信
 
 ```http request
 POST http://localhost:8080/users
